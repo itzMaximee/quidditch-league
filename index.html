@@ -21,6 +21,7 @@
 </div>
 
 <div class="dashboard-container">
+    
     <aside class="sidebar">
         <div class="sidebar-header">
             <div class="crest-icon">🧹</div>
@@ -31,15 +32,16 @@
             <button class="nav-btn" onclick="showPage('roster')" id="nav-roster">Team Roster</button>
             <button class="nav-btn" onclick="showPage('matches')" id="nav-matches">Match Center</button>
         </nav>
-        
         <div class="sidebar-footer">
             <button id="authBtn" onclick="toggleLogin()" class="reset-btn">Admin Login</button>
         </div>
     </aside>
 
     <main class="content">
+        
         <div id="page-overview" class="page-section active-page">
             <h2 class="page-title">League Overview</h2>
+            
             <section id="heroSection" class="hero-card">
                 <div class="hero-content">
                     <h3 class="hero-label">Season MVP Leader</h3>
@@ -59,6 +61,7 @@
                     </div>
                 </div>
             </section>
+
             <div class="panel">
                 <div class="panel-header-row">
                     <h3>House Cup Standings <small style="font-weight:400; color:#999; font-size:0.7em;">(Click Team for Details)</small></h3>
@@ -169,7 +172,7 @@
                     <div class="panel">
                         <h3>Team Roster</h3>
                         <table class="dark-table">
-                            <thead><tr><th>Name</th><th>Pos</th><th>Goals</th><th>Saves</th><th>Def</th><th>Value</th></tr></thead>
+                            <thead><tr><th>Name</th><th>Pos</th><th>Goals</th><th>Saves</th><th>Def</th><th>⚡</th><th>Value</th></tr></thead>
                             <tbody id="detailRosterBody"></tbody>
                         </table>
                     </div>
