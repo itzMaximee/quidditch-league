@@ -1,65 +1,53 @@
 // ==========================================
-// 1. NAVIGATION LOGIC (Moved to Top)
+// 1. NAVIGATION LOGIC
 // ==========================================
 function showPage(pageId) {
-    // 1. Hide all pages
-    document.querySelectorAll('.page-section').forEach(el => {
-        el.classList.remove('active-page');
-    });
-    
-    // 2. Show target page
+    document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active-page'));
     const targetPage = document.getElementById('page-' + pageId);
-    if (targetPage) {
-        targetPage.classList.add('active-page');
-    }
+    if (targetPage) targetPage.classList.add('active-page');
 
-    // 3. Update Sidebar Buttons
-    document.querySelectorAll('.nav-btn').forEach(btn => {
-        btn.classList.remove('active');
-    });
+    document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
     const activeBtn = document.getElementById('nav-' + pageId);
-    if (activeBtn) {
-        activeBtn.classList.add('active');
-    }
+    if (activeBtn) activeBtn.classList.add('active');
 }
 
 // ==========================================
-// 2. SUPABASE SETUP
+// 2. SUPABASE SETUP (RENAMED TO FIX ERROR)
 // ==========================================
-// Ensure these keys are on ONE SINGLE LINE each
 const SUPABASE_URL = 'https://xugasmrxombmdgnukfky.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh1Z2FzbXJ4b21ibWRnbnVrZmt5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg3MjQ1ODUsImV4cCI6MjA4NDMwMDU4NX0.Ie8qJi_TcEr_ByaSdxXXIPrWmsZCcqjJ5wt0daVsOTA';
 
-let supabase;
+// CHANGED VARIABLE NAME FROM 'supabase' TO 'supabaseClient'
+let supabaseClient; 
 
-// Initialize Supabase safely
 if (window.supabase) {
-    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    console.log("Supabase connected successfully.");
+    // We use the library (window.supabase) to create our client (supabaseClient)
+    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    console.log("Supabase connected.");
 } else {
-    console.error("CRITICAL ERROR: Supabase library not found. Check index.html <head>.");
+    console.error("Supabase library not found!");
 }
 
 // ==========================================
-// 3. STATE & INITIALIZATION
+// 3. STATE MANAGEMENT
 // ==========================================
 let teams = [];
 let matches = [];
 let players = [];
 
+// ==========================================
+// 4. INITIALIZATION
+// ==========================================
 async function init() {
-    if (!supabase) return;
+    if (!supabaseClient) return;
 
-    // Fetch all data
     await Promise.all([
         fetchTeams(),
         fetchPlayers(),
         fetchMatches()
     ]);
-    
     render();
     
-    // Remove "Loading..." text
     const heroName = document.getElementById('heroName');
     if(heroName && heroName.innerText === 'Loading...') {
         heroName.innerText = "NO DATA";
@@ -67,35 +55,33 @@ async function init() {
 }
 
 // ==========================================
-// 4. DATABASE FUNCTIONS
+// 5. DATABASE FUNCTIONS (UPDATED)
 // ==========================================
 async function fetchTeams() {
-    const { data, error } = await supabase.from('teams').select('*');
-    if (error) console.error("Teams Error:", error);
-    else teams = data || [];
+    // Updated to use supabaseClient
+    const { data, error } = await supabaseClient.from('teams').select('*');
+    if (!error) teams = data || [];
 }
 
 async function fetchPlayers() {
-    const { data, error } = await supabase.from('players').select('*');
-    if (error) console.error("Players Error:", error);
-    else players = data || [];
+    const { data, error } = await supabaseClient.from('players').select('*');
+    if (!error) players = data || [];
 }
 
 async function fetchMatches() {
-    const { data, error } = await supabase.from('matches').select('*');
-    if (error) console.error("Matches Error:", error);
-    else matches = data || [];
+    const { data, error } = await supabaseClient.from('matches').select('*');
+    if (!error) matches = data || [];
 }
 
 // ==========================================
-// 5. ACTION FUNCTIONS
+// 6. ACTION FUNCTIONS (UPDATED)
 // ==========================================
 async function addTeam() {
     const input = document.getElementById('teamNameInput');
     const name = input.value.trim();
     if (!name) return alert("Enter Name");
 
-    const { error } = await supabase.from('teams').insert({ name: name });
+    const { error } = await supabaseClient.from('teams').insert({ name: name });
 
     if (error) alert("Error: " + error.message);
     else {
@@ -112,7 +98,7 @@ async function addPlayer() {
 
     if (!name || team.includes("Select")) return alert("Check inputs");
 
-    const { error } = await supabase.from('players').insert({
+    const { error } = await supabaseClient.from('players').insert({
         name: name, team: team, position: pos
     });
 
@@ -136,7 +122,7 @@ async function updateStat(type) {
     if (type === 'saves') update = { saves: p.saves + 1 };
     if (type === 'defense') update = { defense: p.defense + 1 };
 
-    const { error } = await supabase.from('players').update(update).eq('id', pid);
+    const { error } = await supabaseClient.from('players').update(update).eq('id', pid);
     if (!error) {
         await fetchPlayers();
         render();
@@ -153,7 +139,7 @@ async function addMatch() {
 
     if (home === away || isNaN(hScore)) return alert("Check inputs");
 
-    const { error: matchErr } = await supabase.from('matches').insert({
+    const { error: matchErr } = await supabaseClient.from('matches').insert({
         home: home, away: away, h_score: hScore, a_score: aScore,
         snitch_id: snitchId || null, defender_id: defenderId || null
     });
@@ -162,11 +148,11 @@ async function addMatch() {
 
     if (snitchId) {
         const p = players.find(x => x.id == snitchId);
-        await supabase.from('players').update({ snitches: p.snitches + 1 }).eq('id', snitchId);
+        await supabaseClient.from('players').update({ snitches: p.snitches + 1 }).eq('id', snitchId);
     }
     if (defenderId) {
         const p = players.find(x => x.id == defenderId);
-        await supabase.from('players').update({ defense: p.defense + 2 }).eq('id', defenderId);
+        await supabaseClient.from('players').update({ defense: p.defense + 2 }).eq('id', defenderId);
     }
 
     document.getElementById('homeScore').value = '';
@@ -176,7 +162,7 @@ async function addMatch() {
 }
 
 // ==========================================
-// 6. RENDER & CALCULATIONS
+// 7. RENDER & CALCULATIONS
 // ==========================================
 function openTeamDetails(teamName) {
     showPage('team-details');
