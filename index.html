@@ -98,7 +98,9 @@
                     </div>
                     <div class="panel">
                         <h3>Training Stats</h3>
-                        <select id="statPlayerSelect" style="margin-bottom:15px; width:100%;"><option>Select Player...</option></select>
+                        <select id="statPlayerSelect" style="margin-bottom:15px; width:100%;">
+                            <option value="">Select Player...</option>
+                        </select>
                         <div class="stat-buttons">
                             <button onclick="updateStat('goals')" class="stat-pill">Goal</button>
                             <button onclick="updateStat('saves')" class="stat-pill">Save</button>
@@ -108,10 +110,7 @@
                 </div>
                 <div class="column flex-grow">
                     <div class="panel">
-                        <div class="panel-header-row">
-                            <h3>Full Roster</h3>
-                            <button onclick="exportPlayersCSV()" class="text-link">Export CSV</button>
-                        </div>
+                        <h3>Full Roster</h3>
                         <table class="dark-table">
                             <thead><tr><th>Name</th><th>Team</th><th>Pos</th><th>G</th><th>S</th><th>D</th><th>⚡</th><th>Value</th></tr></thead>
                             <tbody id="playerTableBody"></tbody>
@@ -156,12 +155,15 @@
                 <div class="crest-large">🛡️</div>
                 <div class="team-hero-info">
                     <h1 id="detailTeamName">Team Name</h1>
+                    
                     <div class="team-stats-grid">
                         <div class="ts-box"><span class="ts-val" id="detailPlayed">0</span><span class="ts-label">Played</span></div>
                         <div class="ts-box"><span class="ts-val" id="detailWon">0</span><span class="ts-label">Won</span></div>
                         <div class="ts-box"><span class="ts-val" id="detailLost">0</span><span class="ts-label">Lost</span></div>
                         <div class="ts-box"><span class="ts-val" id="detailPoints">0</span><span class="ts-label">Points</span></div>
+                        <div class="ts-box"><span class="ts-val" id="detailSnitches" style="color:#f1c40f;">0</span><span class="ts-label">Snitches</span></div>
                     </div>
+
                 </div>
             </div>
             <div class="grid-layout">
