@@ -12,13 +12,12 @@ function showPage(pageId) {
 }
 
 // ==========================================
-// 2. SUPABASE SETUP (RENAMED TO FIX CRASH)
+// 2. SUPABASE SETUP
 // ==========================================
 const SUPABASE_URL = 'https://xugasmrxombmdgnukfky.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh1Z2FzbXJ4b21ibWRnbnVrZmt5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg3MjQ1ODUsImV4cCI6MjA4NDMwMDU4NX0.Ie8qJi_TcEr_ByaSdxXXIPrWmsZCcqjJ5wt0daVsOTA';
 
-// We use a different name here to avoid conflict with the library
-let supabaseClient; 
+let supabaseClient;
 
 if (window.supabase) {
     supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -174,7 +173,12 @@ function openTeamDetails(teamName) {
     document.getElementById('detailLost').innerText = standings ? standings.L : 0;
     document.getElementById('detailPoints').innerText = standings ? standings.Pts : 0;
 
+    // --- NEW: Calculate Total Team Snitches ---
     const teamPlayers = players.filter(p => p.team === teamName);
+    const totalSnitches = teamPlayers.reduce((sum, player) => sum + (player.snitches || 0), 0);
+    document.getElementById('detailSnitches').innerText = totalSnitches;
+    // ------------------------------------------
+
     document.getElementById('detailRosterBody').innerHTML = teamPlayers.map(p => `
         <tr>
             <td style="font-weight:bold;">${p.name}</td>
