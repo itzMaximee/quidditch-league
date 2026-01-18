@@ -1,5 +1,5 @@
 // ==========================================
-// 1. NAVIGATION
+// 1. NAVIGATION LOGIC
 // ==========================================
 function showPage(pageId) {
     document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active-page'));
@@ -21,29 +21,28 @@ let supabaseClient;
 
 if (window.supabase) {
     supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    console.log("Supabase connected.");
+    console.log("Supabase connected successfully.");
 } else {
     console.error("CRITICAL ERROR: Supabase library not found in HTML.");
 }
 
 // ==========================================
-// 3. AUTHENTICATION (New)
+// 3. AUTHENTICATION (UPDATED)
 // ==========================================
 let currentUser = null;
 
-// Toggle Modal
 function toggleLogin() {
     if (currentUser) {
-        logout(); // If logged in, button acts as logout
+        logout();
     } else {
         document.getElementById('loginModal').style.display = 'flex';
     }
 }
+
 function closeLogin() {
     document.getElementById('loginModal').style.display = 'none';
 }
 
-// Login Function
 async function login() {
     const email = document.getElementById('emailInput').value;
     const pass = document.getElementById('passwordInput').value;
@@ -57,40 +56,39 @@ async function login() {
         alert("Login failed: " + error.message);
     } else {
         closeLogin();
-        checkUser(); // Refresh UI
+        checkUser(); 
     }
 }
 
-// Logout Function
 async function logout() {
     await supabaseClient.auth.signOut();
     checkUser();
 }
 
-// Check User Status & Show/Hide Admin Panels
 async function checkUser() {
     const { data } = await supabaseClient.auth.getSession();
     currentUser = data.session;
 
     const authBtn = document.getElementById('authBtn');
-    const adminPanels = document.querySelectorAll('.admin-only');
 
     if (currentUser) {
-        // LOGGED IN
-        authBtn.innerText = "Logout";
-        authBtn.style.borderColor = "#e74c3c";
-        authBtn.style.color = "#e74c3c";
+        // --- LOGGED IN ---
+        document.body.classList.add('is-admin'); // SHOW PANELS
         
-        // Show Admin Panels
-        adminPanels.forEach(el => el.style.display = 'block');
+        if(authBtn) {
+            authBtn.innerText = "Logout";
+            authBtn.style.borderColor = "#e74c3c";
+            authBtn.style.color = "#e74c3c";
+        }
     } else {
-        // LOGGED OUT
-        authBtn.innerText = "Admin Login";
-        authBtn.style.borderColor = "#ddd";
-        authBtn.style.color = "#999";
+        // --- LOGGED OUT ---
+        document.body.classList.remove('is-admin'); // HIDE PANELS
         
-        // Hide Admin Panels
-        adminPanels.forEach(el => el.style.display = 'none');
+        if(authBtn) {
+            authBtn.innerText = "Admin Login";
+            authBtn.style.borderColor = "#ddd";
+            authBtn.style.color = "#999";
+        }
     }
 }
 
