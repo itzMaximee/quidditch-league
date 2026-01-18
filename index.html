@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quidditch League Manager</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Oswald:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="dashboard-container">
+    
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="crest-icon">🧹</div>
+            <h2>Quidditch<br><span>League</span></h2>
+        </div>
+        <nav>
+            <button class="nav-btn active" onclick="showPage('overview')" id="nav-overview">Overview</button>
+            <button class="nav-btn" onclick="showPage('roster')" id="nav-roster">Team Roster</button>
+            <button class="nav-btn" onclick="showPage('matches')" id="nav-matches">Match Center</button>
+        </nav>
+        <div class="sidebar-footer">
+            <button onclick="clearData()" class="reset-btn">Refresh Data</button>
+        </div>
+    </aside>
+
+    <main class="content">
+        
+        <div id="page-overview" class="page-section active-page">
+            <h2 class="page-title">League Overview</h2>
+            
+            <section id="heroSection" class="hero-card">
+                <div class="hero-content">
+                    <h3 class="hero-label">Season MVP Leader</h3>
+                    <h1 id="heroName">Loading...</h1>
+                    <div class="hero-details">
+                        <div><span class="label">Team</span><span id="heroTeam" class="value">--</span></div>
+                        <div><span class="label">Position</span><span id="heroPos" class="value">--</span></div>
+                        <div><span class="label">Value</span><span id="heroVal" class="value">--</span></div>
+                    </div>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat-circle" id="goalCircle" style="--p:0; --c:#3498db;">
+                        <div class="circle-inner"><span id="heroGoals">0</span><small>Goals</small></div>
+                    </div>
+                    <div class="stat-circle" id="saveCircle" style="--p:0; --c:#2ecc71;">
+                        <div class="circle-inner"><span id="heroSaves">0</span><small>Saves</small></div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="panel">
+                <div class="panel-header-row">
+                    <h3>House Cup Standings <small style="font-weight:400; color:#999; font-size:0.7em;">(Click Team for Details)</small></h3>
+                </div>
+                <table class="dark-table clickable-rows">
+                    <thead>
+                        <tr><th>Pos</th><th>Team</th><th>P</th><th>W</th><th>L</th><th>Pts</th></tr>
+                    </thead>
+                    <tbody id="standingsBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="page-roster" class="page-section">
+            <h2 class="page-title">Team Management</h2>
+            <div class="grid-layout">
+                <div class="column">
+                    <div class="panel">
+                        <h3>Add New Team</h3>
+                        <div class="form-row">
+                            <input type="text" id="teamNameInput" placeholder="Team Name (e.g. Gryffindor)">
+                            <button onclick="addTeam()" class="icon-btn">+</button>
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <h3>Draft Player</h3>
+                        <div class="form-col">
+                            <input type="text" id="playerNameInput" placeholder="Player Name">
+                            <div class="form-row">
+                                <select id="playerTeamSelect"><option>Select Team</option></select>
+                                <select id="playerPositionSelect">
+                                    <option value="Chaser">Chaser</option>
+                                    <option value="Keeper">Keeper</option>
+                                    <option value="Seeker">Seeker</option>
+                                    <option value="Beater">Beater</option>
+                                </select>
+                            </div>
+                            <button onclick="addPlayer()" class="action-btn secondary-btn">Sign Player</button>
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <h3>Training Stats</h3>
+                        <select id="statPlayerSelect" style="margin-bottom:15px; width:100%;"><option>Select Player...</option></select>
+                        <div class="stat-buttons">
+                            <button onclick="updateStat('goals')" class="stat-pill">Goal</button>
+                            <button onclick="updateStat('saves')" class="stat-pill">Save</button>
+                            <button onclick="updateStat('defense')" class="stat-pill">Def</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="column flex-grow">
+                    <div class="panel">
+                        <h3>Full Roster</h3>
+                        <table class="dark-table">
+                            <thead><tr><th>Name</th><th>Team</th><th>Pos</th><th>G</th><th>S</th><th>D</th><th>⚡</th><th>Value</th></tr></thead>
+                            <tbody id="playerTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-matches" class="page-section">
+            <h2 class="page-title">Match Center</h2>
+            <div class="grid-layout">
+                <div class="column">
+                    <div class="panel match-panel">
+                        <div class="panel-header-row"><h3>Record Result</h3></div>
+                        <div class="match-grid-tight">
+                            <div class="team-input-group"><select id="homeTeamSelect"><option>Home Team</option></select></div>
+                            <input type="number" id="homeScore" placeholder="0" class="score-box" min="0">
+                            <div class="vs-badge">VS</div>
+                            <input type="number" id="awayScore" placeholder="0" class="score-box" min="0">
+                            <div class="team-input-group"><select id="awayTeamSelect"><option>Away Team</option></select></div>
+                        </div>
+                        <div class="stats-row">
+                            <div class="half-col"><label>🛡️ Top Defender</label><select id="defenderSelect"><option value="">-- None --</option></select></div>
+                            <div class="half-col"><label>⚡ Snitch Catch</label><select id="snitchPlayerSelect"><option value="">-- None --</option></select></div>
+                        </div>
+                        <button onclick="addMatch()" class="action-btn primary-btn">Record Result</button>
+                    </div>
+                </div>
+                <div class="column flex-grow">
+                    <div class="panel">
+                        <h3>Match History</h3>
+                        <ul id="matchHistory" class="history-list"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-team-details" class="page-section">
+            <button onclick="showPage('overview')" class="back-link">← Back to Overview</button>
+            <div class="team-hero">
+                <div class="crest-large">🛡️</div>
+                <div class="team-hero-info">
+                    <h1 id="detailTeamName">Team Name</h1>
+                    <div class="team-stats-grid">
+                        <div class="ts-box"><span class="ts-val" id="detailPlayed">0</span><span class="ts-label">Played</span></div>
+                        <div class="ts-box"><span class="ts-val" id="detailWon">0</span><span class="ts-label">Won</span></div>
+                        <div class="ts-box"><span class="ts-val" id="detailLost">0</span><span class="ts-label">Lost</span></div>
+                        <div class="ts-box"><span class="ts-val" id="detailPoints">0</span><span class="ts-label">Points</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="grid-layout">
+                <div class="column flex-grow">
+                    <div class="panel">
+                        <h3>Team Roster</h3>
+                        <table class="dark-table">
+                            <thead><tr><th>Name</th><th>Pos</th><th>Goals</th><th>Saves</th><th>Def</th><th>Value</th></tr></thead>
+                            <tbody id="detailRosterBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="panel">
+                        <h3>Team History</h3>
+                        <ul id="detailMatchHistory" class="history-list"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+<script src="script.js"></script>
+</body>
+</html>
