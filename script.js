@@ -1,5 +1,5 @@
 // ==========================================
-// 1. NAVIGATION
+// 1. NAVIGATION LOGIC
 // ==========================================
 function showPage(pageId) {
     document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active-page'));
@@ -21,7 +21,7 @@ let supabaseClient;
 
 if (window.supabase) {
     supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    console.log("Supabase connected.");
+    console.log("Supabase connected successfully.");
 } else {
     console.error("CRITICAL ERROR: Supabase library not found in HTML.");
 }
@@ -301,9 +301,10 @@ function render() {
     fill('statPlayerSelect', pOpts, 'Select Player...');
     fill('defenderSelect', pOpts, '-- None --');
 
-    // === FIX IS HERE: Filter by SEEKER now ===
+    // === FIX: THIS SECTION NOW FILTERS FOR SEEKERS ===
     const sOpts = players.filter(p => p.position === 'Seeker').map(p => ({ val: p.id, txt: `⚡ ${p.name}` }));
     fill('snitchPlayerSelect', sOpts, '-- None --');
+    // =================================================
 
     const standingsBody = document.getElementById('standingsBody');
     if(standingsBody) {
