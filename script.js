@@ -1,5 +1,5 @@
 // ==========================================
-// 1. NAVIGATION
+// 1. NAVIGATION LOGIC
 // ==========================================
 function showPage(pageId) {
     document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active-page'));
@@ -301,8 +301,9 @@ function render() {
     fill('statPlayerSelect', pOpts, 'Select Player...');
     fill('defenderSelect', pOpts, '-- None --');
 
-    const kOpts = players.filter(p => p.position === 'Keeper').map(p => ({ val: p.id, txt: `🛡️ ${p.name}` }));
-    fill('snitchPlayerSelect', kOpts, '-- None --');
+    // --- CHANGED TO SEEKER ---
+    const sOpts = players.filter(p => p.position === 'Seeker').map(p => ({ val: p.id, txt: `⚡ ${p.name}` }));
+    fill('snitchPlayerSelect', sOpts, '-- None --');
 
     const standingsBody = document.getElementById('standingsBody');
     if(standingsBody) {
