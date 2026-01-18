@@ -12,20 +12,19 @@ function showPage(pageId) {
 }
 
 // ==========================================
-// 2. SUPABASE SETUP (RENAMED TO FIX ERROR)
+// 2. SUPABASE SETUP (RENAMED TO FIX CRASH)
 // ==========================================
 const SUPABASE_URL = 'https://xugasmrxombmdgnukfky.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh1Z2FzbXJ4b21ibWRnbnVrZmt5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg3MjQ1ODUsImV4cCI6MjA4NDMwMDU4NX0.Ie8qJi_TcEr_ByaSdxXXIPrWmsZCcqjJ5wt0daVsOTA';
 
-// CHANGED VARIABLE NAME FROM 'supabase' TO 'supabaseClient'
+// We use a different name here to avoid conflict with the library
 let supabaseClient; 
 
 if (window.supabase) {
-    // We use the library (window.supabase) to create our client (supabaseClient)
     supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    console.log("Supabase connected.");
+    console.log("Supabase connected successfully.");
 } else {
-    console.error("Supabase library not found!");
+    console.error("CRITICAL ERROR: Supabase library not found in HTML.");
 }
 
 // ==========================================
@@ -55,10 +54,9 @@ async function init() {
 }
 
 // ==========================================
-// 5. DATABASE FUNCTIONS (UPDATED)
+// 5. DATABASE FUNCTIONS
 // ==========================================
 async function fetchTeams() {
-    // Updated to use supabaseClient
     const { data, error } = await supabaseClient.from('teams').select('*');
     if (!error) teams = data || [];
 }
@@ -74,7 +72,7 @@ async function fetchMatches() {
 }
 
 // ==========================================
-// 6. ACTION FUNCTIONS (UPDATED)
+// 6. ACTION FUNCTIONS
 // ==========================================
 async function addTeam() {
     const input = document.getElementById('teamNameInput');
