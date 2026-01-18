@@ -1,5 +1,5 @@
 // ==========================================
-// 1. NAVIGATION LOGIC
+// 1. NAVIGATION
 // ==========================================
 function showPage(pageId) {
     document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active-page'));
@@ -21,13 +21,13 @@ let supabaseClient;
 
 if (window.supabase) {
     supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    console.log("Supabase connected successfully.");
+    console.log("Supabase connected.");
 } else {
     console.error("CRITICAL ERROR: Supabase library not found in HTML.");
 }
 
 // ==========================================
-// 3. AUTHENTICATION (UPDATED)
+// 3. AUTHENTICATION
 // ==========================================
 let currentUser = null;
 
@@ -73,8 +73,7 @@ async function checkUser() {
 
     if (currentUser) {
         // --- LOGGED IN ---
-        document.body.classList.add('is-admin'); // SHOW PANELS
-        
+        document.body.classList.add('is-admin'); 
         if(authBtn) {
             authBtn.innerText = "Logout";
             authBtn.style.borderColor = "#e74c3c";
@@ -82,8 +81,7 @@ async function checkUser() {
         }
     } else {
         // --- LOGGED OUT ---
-        document.body.classList.remove('is-admin'); // HIDE PANELS
-        
+        document.body.classList.remove('is-admin'); 
         if(authBtn) {
             authBtn.innerText = "Admin Login";
             authBtn.style.borderColor = "#ddd";
@@ -102,7 +100,6 @@ let players = [];
 async function init() {
     if (!supabaseClient) return;
 
-    // Check Auth on Load
     checkUser();
 
     await Promise.all([
@@ -252,6 +249,7 @@ function openTeamDetails(teamName) {
             <td style="font-weight:bold;">${p.name}</td>
             <td style="text-transform:uppercase; font-size:0.8rem; color:#888;">${p.position}</td>
             <td>${p.goals}</td><td>${p.saves}</td><td>${p.defense}</td>
+            <td>${p.snitches}</td>
             <td style="color:#27ae60; font-weight:bold;">$${getPlayerValue(p)}</td>
         </tr>
     `).join('');
