@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quidditch League Manager</title>
+    
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Oswald:wght@400;600&display=swap" rel="stylesheet">
+    
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -55,6 +58,7 @@
             <div class="panel">
                 <div class="panel-header-row">
                     <h3>House Cup Standings <small style="font-weight:400; color:#999; font-size:0.7em;">(Click Team for Details)</small></h3>
+                    <button onclick="exportStandingsCSV()" class="text-link">Export CSV</button>
                 </div>
                 <table class="dark-table clickable-rows">
                     <thead>
@@ -104,7 +108,10 @@
                 </div>
                 <div class="column flex-grow">
                     <div class="panel">
-                        <h3>Full Roster</h3>
+                        <div class="panel-header-row">
+                            <h3>Full Roster</h3>
+                            <button onclick="exportPlayersCSV()" class="text-link">Export CSV</button>
+                        </div>
                         <table class="dark-table">
                             <thead><tr><th>Name</th><th>Team</th><th>Pos</th><th>G</th><th>S</th><th>D</th><th>⚡</th><th>Value</th></tr></thead>
                             <tbody id="playerTableBody"></tbody>
