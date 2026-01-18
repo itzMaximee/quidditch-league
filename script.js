@@ -1,5 +1,5 @@
 // ==========================================
-// 1. NAVIGATION LOGIC
+// 1. NAVIGATION
 // ==========================================
 function showPage(pageId) {
     document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active-page'));
@@ -301,7 +301,7 @@ function render() {
     fill('statPlayerSelect', pOpts, 'Select Player...');
     fill('defenderSelect', pOpts, '-- None --');
 
-    // --- CHANGED TO SEEKER ---
+    // === FIX IS HERE: Filter by SEEKER now ===
     const sOpts = players.filter(p => p.position === 'Seeker').map(p => ({ val: p.id, txt: `⚡ ${p.name}` }));
     fill('snitchPlayerSelect', sOpts, '-- None --');
 
