@@ -1,5 +1,5 @@
 // ==========================================
-// 1. NAVIGATION LOGIC
+// 1. NAVIGATION
 // ==========================================
 function showPage(pageId) {
     document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active-page'));
@@ -21,23 +21,91 @@ let supabaseClient;
 
 if (window.supabase) {
     supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    console.log("Supabase connected successfully.");
+    console.log("Supabase connected.");
 } else {
     console.error("CRITICAL ERROR: Supabase library not found in HTML.");
 }
 
 // ==========================================
-// 3. STATE MANAGEMENT
+// 3. AUTHENTICATION (New)
+// ==========================================
+let currentUser = null;
+
+// Toggle Modal
+function toggleLogin() {
+    if (currentUser) {
+        logout(); // If logged in, button acts as logout
+    } else {
+        document.getElementById('loginModal').style.display = 'flex';
+    }
+}
+function closeLogin() {
+    document.getElementById('loginModal').style.display = 'none';
+}
+
+// Login Function
+async function login() {
+    const email = document.getElementById('emailInput').value;
+    const pass = document.getElementById('passwordInput').value;
+    
+    const { data, error } = await supabaseClient.auth.signInWithPassword({
+        email: email,
+        password: pass
+    });
+
+    if (error) {
+        alert("Login failed: " + error.message);
+    } else {
+        closeLogin();
+        checkUser(); // Refresh UI
+    }
+}
+
+// Logout Function
+async function logout() {
+    await supabaseClient.auth.signOut();
+    checkUser();
+}
+
+// Check User Status & Show/Hide Admin Panels
+async function checkUser() {
+    const { data } = await supabaseClient.auth.getSession();
+    currentUser = data.session;
+
+    const authBtn = document.getElementById('authBtn');
+    const adminPanels = document.querySelectorAll('.admin-only');
+
+    if (currentUser) {
+        // LOGGED IN
+        authBtn.innerText = "Logout";
+        authBtn.style.borderColor = "#e74c3c";
+        authBtn.style.color = "#e74c3c";
+        
+        // Show Admin Panels
+        adminPanels.forEach(el => el.style.display = 'block');
+    } else {
+        // LOGGED OUT
+        authBtn.innerText = "Admin Login";
+        authBtn.style.borderColor = "#ddd";
+        authBtn.style.color = "#999";
+        
+        // Hide Admin Panels
+        adminPanels.forEach(el => el.style.display = 'none');
+    }
+}
+
+// ==========================================
+// 4. INITIALIZATION
 // ==========================================
 let teams = [];
 let matches = [];
 let players = [];
 
-// ==========================================
-// 4. INITIALIZATION
-// ==========================================
 async function init() {
     if (!supabaseClient) return;
+
+    // Check Auth on Load
+    checkUser();
 
     await Promise.all([
         fetchTeams(),
@@ -74,6 +142,7 @@ async function fetchMatches() {
 // 6. ACTION FUNCTIONS
 // ==========================================
 async function addTeam() {
+    if(!currentUser) return alert("Please login first.");
     const input = document.getElementById('teamNameInput');
     const name = input.value.trim();
     if (!name) return alert("Enter Name");
@@ -89,6 +158,7 @@ async function addTeam() {
 }
 
 async function addPlayer() {
+    if(!currentUser) return alert("Please login first.");
     const name = document.getElementById('playerNameInput').value.trim();
     const team = document.getElementById('playerTeamSelect').value;
     const pos = document.getElementById('playerPositionSelect').value;
@@ -108,6 +178,7 @@ async function addPlayer() {
 }
 
 async function updateStat(type) {
+    if(!currentUser) return alert("Please login first.");
     const pid = document.getElementById('statPlayerSelect').value;
     if (!pid) return alert("Select player");
 
@@ -127,6 +198,7 @@ async function updateStat(type) {
 }
 
 async function addMatch() {
+    if(!currentUser) return alert("Please login first.");
     const home = document.getElementById('homeTeamSelect').value;
     const away = document.getElementById('awayTeamSelect').value;
     const hScore = parseInt(document.getElementById('homeScore').value);
@@ -173,11 +245,9 @@ function openTeamDetails(teamName) {
     document.getElementById('detailLost').innerText = standings ? standings.L : 0;
     document.getElementById('detailPoints').innerText = standings ? standings.Pts : 0;
 
-    // --- NEW: Calculate Total Team Snitches ---
     const teamPlayers = players.filter(p => p.team === teamName);
     const totalSnitches = teamPlayers.reduce((sum, player) => sum + (player.snitches || 0), 0);
     document.getElementById('detailSnitches').innerText = totalSnitches;
-    // ------------------------------------------
 
     document.getElementById('detailRosterBody').innerHTML = teamPlayers.map(p => `
         <tr>
