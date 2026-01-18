@@ -4,17 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quidditch League Manager</title>
-    
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Oswald:wght@400;600&display=swap" rel="stylesheet">
-    
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+<div id="loginModal" class="modal-overlay">
+    <div class="modal-box">
+        <h3>Admin Login</h3>
+        <input type="email" id="emailInput" placeholder="Email">
+        <input type="password" id="passwordInput" placeholder="Password">
+        <button onclick="login()" class="action-btn primary-btn">Login</button>
+        <button onclick="closeLogin()" class="action-btn secondary-btn" style="margin-top:10px;">Cancel</button>
+    </div>
+</div>
+
 <div class="dashboard-container">
-    
     <aside class="sidebar">
         <div class="sidebar-header">
             <div class="crest-icon">🧹</div>
@@ -26,15 +32,13 @@
             <button class="nav-btn" onclick="showPage('matches')" id="nav-matches">Match Center</button>
         </nav>
         <div class="sidebar-footer">
-            <button onclick="clearData()" class="reset-btn">Refresh Data</button>
+            <button id="authBtn" onclick="toggleLogin()" class="reset-btn">Admin Login</button>
         </div>
     </aside>
 
     <main class="content">
-        
         <div id="page-overview" class="page-section active-page">
             <h2 class="page-title">League Overview</h2>
-            
             <section id="heroSection" class="hero-card">
                 <div class="hero-content">
                     <h3 class="hero-label">Season MVP Leader</h3>
@@ -54,16 +58,13 @@
                     </div>
                 </div>
             </section>
-
             <div class="panel">
                 <div class="panel-header-row">
                     <h3>House Cup Standings <small style="font-weight:400; color:#999; font-size:0.7em;">(Click Team for Details)</small></h3>
                     <button onclick="exportStandingsCSV()" class="text-link">Export CSV</button>
                 </div>
                 <table class="dark-table clickable-rows">
-                    <thead>
-                        <tr><th>Pos</th><th>Team</th><th>P</th><th>W</th><th>L</th><th>Pts</th></tr>
-                    </thead>
+                    <thead><tr><th>Pos</th><th>Team</th><th>P</th><th>W</th><th>L</th><th>Pts</th></tr></thead>
                     <tbody id="standingsBody"></tbody>
                 </table>
             </div>
@@ -73,14 +74,14 @@
             <h2 class="page-title">Team Management</h2>
             <div class="grid-layout">
                 <div class="column">
-                    <div class="panel">
+                    <div class="panel admin-only">
                         <h3>Add New Team</h3>
                         <div class="form-row">
                             <input type="text" id="teamNameInput" placeholder="Team Name (e.g. Gryffindor)">
                             <button onclick="addTeam()" class="icon-btn">+</button>
                         </div>
                     </div>
-                    <div class="panel">
+                    <div class="panel admin-only">
                         <h3>Draft Player</h3>
                         <div class="form-col">
                             <input type="text" id="playerNameInput" placeholder="Player Name">
@@ -96,11 +97,9 @@
                             <button onclick="addPlayer()" class="action-btn secondary-btn">Sign Player</button>
                         </div>
                     </div>
-                    <div class="panel">
+                    <div class="panel admin-only">
                         <h3>Training Stats</h3>
-                        <select id="statPlayerSelect" style="margin-bottom:15px; width:100%;">
-                            <option value="">Select Player...</option>
-                        </select>
+                        <select id="statPlayerSelect" style="margin-bottom:15px; width:100%;"><option>Select Player...</option></select>
                         <div class="stat-buttons">
                             <button onclick="updateStat('goals')" class="stat-pill">Goal</button>
                             <button onclick="updateStat('saves')" class="stat-pill">Save</button>
@@ -124,7 +123,7 @@
             <h2 class="page-title">Match Center</h2>
             <div class="grid-layout">
                 <div class="column">
-                    <div class="panel match-panel">
+                    <div class="panel match-panel admin-only">
                         <div class="panel-header-row"><h3>Record Result</h3></div>
                         <div class="match-grid-tight">
                             <div class="team-input-group"><select id="homeTeamSelect"><option>Home Team</option></select></div>
@@ -155,7 +154,6 @@
                 <div class="crest-large">🛡️</div>
                 <div class="team-hero-info">
                     <h1 id="detailTeamName">Team Name</h1>
-                    
                     <div class="team-stats-grid">
                         <div class="ts-box"><span class="ts-val" id="detailPlayed">0</span><span class="ts-label">Played</span></div>
                         <div class="ts-box"><span class="ts-val" id="detailWon">0</span><span class="ts-label">Won</span></div>
@@ -163,7 +161,6 @@
                         <div class="ts-box"><span class="ts-val" id="detailPoints">0</span><span class="ts-label">Points</span></div>
                         <div class="ts-box"><span class="ts-val" id="detailSnitches" style="color:#f1c40f;">0</span><span class="ts-label">Snitches</span></div>
                     </div>
-
                 </div>
             </div>
             <div class="grid-layout">
