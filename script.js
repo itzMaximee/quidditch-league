@@ -1,20 +1,32 @@
 // ==========================================
-// 1. NAVIGATION LOGIC (Crash-Proof)
+// 1. NAVIGATION LOGIC (Moved to Top)
 // ==========================================
 function showPage(pageId) {
-    document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active-page'));
+    // 1. Hide all pages
+    document.querySelectorAll('.page-section').forEach(el => {
+        el.classList.remove('active-page');
+    });
+    
+    // 2. Show target page
     const targetPage = document.getElementById('page-' + pageId);
-    if (targetPage) targetPage.classList.add('active-page');
+    if (targetPage) {
+        targetPage.classList.add('active-page');
+    }
 
-    document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+    // 3. Update Sidebar Buttons
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
     const activeBtn = document.getElementById('nav-' + pageId);
-    if (activeBtn) activeBtn.classList.add('active');
+    if (activeBtn) {
+        activeBtn.classList.add('active');
+    }
 }
 
 // ==========================================
 // 2. SUPABASE SETUP
 // ==========================================
-// --- PASTE YOUR KEYS HERE ---
+// Ensure these keys are on ONE SINGLE LINE each
 const SUPABASE_URL = 'https://xugasmrxombmdgnukfky.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh1Z2FzbXJ4b21ibWRnbnVrZmt5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg3MjQ1ODUsImV4cCI6MjA4NDMwMDU4NX0.Ie8qJi_TcEr_ByaSdxXXIPrWmsZCcqjJ5wt0daVsOTA';
 
@@ -23,32 +35,31 @@ let supabase;
 // Initialize Supabase safely
 if (window.supabase) {
     supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    console.log("Supabase connected.");
+    console.log("Supabase connected successfully.");
 } else {
-    console.error("Supabase library not found!");
+    console.error("CRITICAL ERROR: Supabase library not found. Check index.html <head>.");
 }
 
 // ==========================================
-// 3. STATE MANAGEMENT
+// 3. STATE & INITIALIZATION
 // ==========================================
 let teams = [];
 let matches = [];
 let players = [];
 
-// ==========================================
-// 4. INITIALIZATION
-// ==========================================
 async function init() {
     if (!supabase) return;
 
+    // Fetch all data
     await Promise.all([
         fetchTeams(),
         fetchPlayers(),
         fetchMatches()
     ]);
+    
     render();
     
-    // Clear Loading State
+    // Remove "Loading..." text
     const heroName = document.getElementById('heroName');
     if(heroName && heroName.innerText === 'Loading...') {
         heroName.innerText = "NO DATA";
@@ -56,25 +67,28 @@ async function init() {
 }
 
 // ==========================================
-// 5. DATABASE FUNCTIONS
+// 4. DATABASE FUNCTIONS
 // ==========================================
 async function fetchTeams() {
     const { data, error } = await supabase.from('teams').select('*');
-    if (!error) teams = data || [];
+    if (error) console.error("Teams Error:", error);
+    else teams = data || [];
 }
 
 async function fetchPlayers() {
     const { data, error } = await supabase.from('players').select('*');
-    if (!error) players = data || [];
+    if (error) console.error("Players Error:", error);
+    else players = data || [];
 }
 
 async function fetchMatches() {
     const { data, error } = await supabase.from('matches').select('*');
-    if (!error) matches = data || [];
+    if (error) console.error("Matches Error:", error);
+    else matches = data || [];
 }
 
 // ==========================================
-// 6. ACTION FUNCTIONS
+// 5. ACTION FUNCTIONS
 // ==========================================
 async function addTeam() {
     const input = document.getElementById('teamNameInput');
@@ -162,7 +176,7 @@ async function addMatch() {
 }
 
 // ==========================================
-// 7. RENDER & CALCULATIONS
+// 6. RENDER & CALCULATIONS
 // ==========================================
 function openTeamDetails(teamName) {
     showPage('team-details');
